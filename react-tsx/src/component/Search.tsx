@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -7,13 +6,11 @@ import { BiLoaderCircle } from "react-icons/bi";
 
 // Image
 import noData from "../assets/images/no-data/no-data.svg";
-import AlertCreate from "../z-global/notifications/AlertCreate";
 
 const Search: React.FC = () => {
   const [countries, setCountries] = useState<any[]>([]);
   const [displayedCountries, setDisplayedCountries] = useState<number>(5);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [isCreateAlert, setCreateAlert] = useState<boolean>(false);
   const [isSubmit, setSubmit] = useState<boolean>(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
@@ -40,27 +37,39 @@ const Search: React.FC = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleSave = (name: string, index: number) => {
+  const handleSave = (name: string, population: number, area: number, description: string, index: number) => {
     setSubmit(true);
     setSelectedIndex(index);
+  
+    console.log(name);
+    console.log(population);
+    console.log(area);
+    console.log(description);
+  
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("population", population.toString());
+    formData.append("area", area.toString());
+    formData.append("description", description);
+  
     axios
       .post(`${import.meta.env.VITE_REACT_APP_API_BASE_URL}store`, formData)
       .then((response) => {
         console.log(response);
         if (response.data.message === "Data created successfully") {
           setSubmit(false);
-          setCreateAlert(true);
           setTimeout(() => {
-            setCreateAlert(false);
+            // Perform actions after the timeout, if needed
+            console.log("Timeout completed");
           }, 2000); // 2000 milliseconds (2 seconds)
         }
       })
       .catch((error) => {
+        setSubmit(false);
         console.log(error);
       });
   };
+  
 
   const filteredCountries = countries.filter((country) =>
     country.name?.common.toLowerCase().includes(searchQuery.toLowerCase())
@@ -87,15 +96,6 @@ const Search: React.FC = () => {
                 />
               </div>
             </div>
-          </div>
-
-          <div className="my-6 text-center">
-            <Link
-              to="#"
-              className="text-center font-medium py-2 px-2 rounded-md transition-all duration-300 transform opacity-100 border-2 border-blue-500 hover:text-white hover:bg-blue-500"
-            >
-              View Save Data
-            </Link>
           </div>
 
           {/* Data */}
@@ -128,7 +128,7 @@ const Search: React.FC = () => {
                       <div className="mt-2">
                         <button
                           onClick={() => {
-                            handleSave(country.name?.common, index);
+                            handleSave(country.name?.common, country.population, country.area, country.flags.alt, index);
                           }}
                           disabled={isSubmit}
                           className={`cursor-pointer text-center font-medium py-2 px-2 rounded-md transition-all duration-300 transform opacity-100 border-2 border-blue-500 hover:text-white hover:bg-blue-500 ${
@@ -136,12 +136,12 @@ const Search: React.FC = () => {
                           }`}
                         >
                           {isSubmit && selectedIndex === index ? (
-                            <div className="flex items-cente">
+                            <div className="flex items-center">
                               <BiLoaderCircle className="animate-spin mr-2 loader-icon " />{" "}
-                              Saving in...
+                              Select
                             </div>
                           ) : (
-                            <>Save</>
+                            <>Select</>
                           )}
                         </button>
                       </div>
@@ -166,11 +166,6 @@ const Search: React.FC = () => {
           </div>
         </div>
       </div>
-      {isCreateAlert && (
-        <>
-          <AlertCreate />
-        </>
-      )}
     </>
   );
 };

@@ -33,37 +33,25 @@ class CountryController extends Controller
             // Validate the request
             $request->validate([
                 'name' => 'required|string|max:255',
+                'population' => 'required|integer',
+                'area' => 'required|numeric',
+                'description' => 'string',
             ]);
 
-            // Make an HTTP request to the API
-            $apiUrl = 'https://restcountries.com/v3.1/all';
-            $response = file_get_contents($apiUrl);
-            $countries = json_decode($response, true);
 
-            // Find the country with the desired name
-            $targetCountry = null;
-            foreach ($countries as $country) {
-                if ($country['name']['common'] === $request->name) {
-                    $targetCountry = $country;
-                    break;
-                }
-            }
+            // Save the relevant data to the database using Eloquent
+            $data = CountryModel::create([
+                'name' => $request->name,
+                'population' => $request->population,
+                'area' => $request->area,
+                'description' => $request->description ?? null,
+            ]);
 
-            // Check if the country is found
-            if ($targetCountry) {
-                // Save the relevant data to the database using Eloquent
-                $data = CountryModel::create([
-                    'name' => $targetCountry['name']['common'],
-                    'population' => $targetCountry['population'] ?? null,
-                    'area' => $targetCountry['area'] ?? null,
-                    'description' => $targetCountry['flags']['alt'] ?? null,
-                ]);
-
-                if ($data) {
-                    return response()->json([
-                        'message' => 'Data created successfully',
-                    ], Response::HTTP_CREATED);
-                }
+            if ($data) {
+                return response()->json([
+                    'message' => 'Data created successfully',
+                    'id' => $data->id,
+                ], Response::HTTP_CREATED);
             }
 
             // Handle the case when the country is not found
