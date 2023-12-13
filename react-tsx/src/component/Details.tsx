@@ -57,13 +57,14 @@ const Details: React.FC = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, [id]);
+  }, [id, isUpdateContainer]);
 
   const handleEdit = () => {
     setUpdateContainer(true);
   };
 
   const handleCloseContainer = () => {
+    setNoChanges("");
     setUpdateContainer(false);
     setErrorName(null);
     setErrorUrlFlag(null);
@@ -88,9 +89,9 @@ const Details: React.FC = () => {
         if (response.data.message === "Data update successfully") {
           setSubmit(false);
           setAlertUpdate(true);
+          setUpdateContainer(false);
           setTimeout(() => {
             setAlertUpdate(false);
-            setUpdateContainer(false)
           }, 2000);
 
           setErrorName(null);
@@ -99,7 +100,7 @@ const Details: React.FC = () => {
           setErrorArea(null);
           setErrorDescription(null);
           setNoChanges("");
-        }else{
+        } else {
           setNoChanges(response.data.message);
           setSubmit(false);
         }
@@ -135,6 +136,7 @@ const Details: React.FC = () => {
           setErrorPopulation(population);
           setErrorArea(area);
           setErrorDescription(description);
+          setNoChanges("");
         }
       });
   };
@@ -176,7 +178,7 @@ const Details: React.FC = () => {
                 <div>
                   <p>Population: {countryData.population}</p>
                   <p>Area: {countryData.area}</p>
-                  {countryData.description && (
+                  {countryData.description !== "undefined" && (
                     <p>Description: {countryData.description}</p>
                   )}
                 </div>

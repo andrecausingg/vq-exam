@@ -181,9 +181,10 @@ class CountryController extends Controller
             // Validate the request
             $request->validate([
                 'name' => 'required',
-                'url_flag' => 'required',
+                'url_flag' => 'required|url',
                 'population' => 'required',
                 'area' => 'required',
+                'description' => 'nullable',
             ]);
 
             // Check for differences and update only if necessary
@@ -198,7 +199,19 @@ class CountryController extends Controller
             if ($data->area !== $request->input('area')) {
                 $data->area = $request->input('area');
             }
-            
+
+            // Check if the input description is empty, and set to null if it is
+            if ($request->input('description') === '') {
+                $data->description = null;
+            } elseif ($data->description !== $request->input('description')) {
+                $data->description = $request->input('description');
+            }
+
+            // Check if the input url_flag is a valid URL
+            if ($data->url_flag !== $request->input('url_flag')) {
+                $data->url_flag = $request->input('url_flag');
+            }
+
             // Save only if there are differences
             if ($data->isDirty() && $data->save()) {
                 return response()->json([
