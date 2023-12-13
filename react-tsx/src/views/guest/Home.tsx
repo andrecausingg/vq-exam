@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import Search from "../../component/Search";
 
 const Home: React.FC = () => {
   useEffect(() => {
@@ -7,6 +8,7 @@ const Home: React.FC = () => {
 
   return (
     <>
+      <Search />
     </>
   );
 };
