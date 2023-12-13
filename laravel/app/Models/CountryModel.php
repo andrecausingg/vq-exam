@@ -12,6 +12,7 @@ class CountryModel extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'name',
+        'url_flag',
         'population',
         'area',
         'description'

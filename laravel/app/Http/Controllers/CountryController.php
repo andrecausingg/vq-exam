@@ -33,6 +33,7 @@ class CountryController extends Controller
             // Validate the request
             $request->validate([
                 'name' => 'required|string|max:255',
+                'url_flag' => 'required',
                 'population' => 'required|integer',
                 'area' => 'required|numeric',
                 'description' => 'string',
@@ -42,6 +43,7 @@ class CountryController extends Controller
             // Save the relevant data to the database using Eloquent
             $data = CountryModel::create([
                 'name' => $request->name,
+                'url_flag' => $request->url_flag,
                 'population' => $request->population,
                 'area' => $request->area,
                 'description' => $request->description ?? null,
@@ -105,7 +107,7 @@ class CountryController extends Controller
 
             return response()->json([
                 'data' => $data
-            ], Response::HTTP_UNAUTHORIZED);
+            ], Response::HTTP_OK);
         } catch (\Exception $e) {
             // Handle exceptions and return an error response with CORS headers
             $errorMessage = $e->getMessage();
@@ -146,6 +148,7 @@ class CountryController extends Controller
             // Validate the request
             $request->validate([
                 'name' => 'required',
+                'urlFlag' => 'required',
                 'population' => 'required',
                 'area' => 'required',
                 'description' => 'string',
@@ -197,7 +200,7 @@ class CountryController extends Controller
             if (!$data) {
                 return response()->json([
                     'messages' => 'Data Not Found'
-                ], Response::HTTP_UNAUTHORIZED);
+                ], Response::HTTP_OK);
             }
 
             if ($data->delete()) {

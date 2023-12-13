@@ -16,6 +16,7 @@ const AlertDelete: React.FC = () => {
       >
         <p className="font-bold">Successfully Delete:</p>
         <p className="text-sm">Data successfully deleted into the database.</p>
+        <h1>Redirecting to Search Countries</h1>
       </div>
     </>
   );

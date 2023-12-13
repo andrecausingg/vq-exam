@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('countries_tbl', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->text('url_flag');
             $table->bigInteger('population');
             $table->double('area');
             $table->text('description')->nullable();

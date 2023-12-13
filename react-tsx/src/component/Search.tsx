@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Icon
@@ -8,6 +9,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import noData from "../assets/images/no-data/no-data.svg";
 
 const Search: React.FC = () => {
+  const navigate = useNavigate();
   const [countries, setCountries] = useState<any[]>([]);
   const [displayedCountries, setDisplayedCountries] = useState<number>(5);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -37,17 +39,13 @@ const Search: React.FC = () => {
     setSearchQuery(e.target.value);
   };
 
-  const handleSave = (name: string, population: number, area: number, description: string, index: number) => {
+  const handleSave = (name: string, flag:string, population: number, area: number, description: string, index: number) => {
     setSubmit(true);
     setSelectedIndex(index);
   
-    console.log(name);
-    console.log(population);
-    console.log(area);
-    console.log(description);
-  
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("url_flag", flag);
     formData.append("population", population.toString());
     formData.append("area", area.toString());
     formData.append("description", description);
@@ -57,11 +55,7 @@ const Search: React.FC = () => {
       .then((response) => {
         console.log(response);
         if (response.data.message === "Data created successfully") {
-          setSubmit(false);
-          setTimeout(() => {
-            // Perform actions after the timeout, if needed
-            console.log("Timeout completed");
-          }, 2000); // 2000 milliseconds (2 seconds)
+          navigate(`/details/${response.data.id}`);
         }
       })
       .catch((error) => {
@@ -128,7 +122,7 @@ const Search: React.FC = () => {
                       <div className="mt-2">
                         <button
                           onClick={() => {
-                            handleSave(country.name?.common, country.population, country.area, country.flags.alt, index);
+                            handleSave(country.name?.common, country.flags.svg, country.population, country.area, country.flags.alt, index);
                           }}
                           disabled={isSubmit}
                           className={`cursor-pointer text-center font-medium py-2 px-2 rounded-md transition-all duration-300 transform opacity-100 border-2 border-blue-500 hover:text-white hover:bg-blue-500 ${
