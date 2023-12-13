@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::post('store', [CountryController::class, 'store']);
+Route::get('show/{id}', [CountryController::class, 'show']);
 Route::get('edit/{id}', [CountryController::class, 'edit']);
 Route::post('update/{id}', [CountryController::class, 'update']);
 Route::delete('destroy/{id}', [CountryController::class, 'destroy']);

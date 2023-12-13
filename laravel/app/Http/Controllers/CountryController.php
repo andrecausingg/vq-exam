@@ -89,7 +89,39 @@ class CountryController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $data = CountryModel::find($id);
+            if (!$data) {
+                return response()->json([
+                    'messages' => 'Data Not Found'
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+
+            return response()->json([
+                'data' => $data
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Handle exceptions and return an error response with CORS headers
+            $errorMessage = $e->getMessage();
+            $errorCode = $e->getCode();
+
+            // Create a JSON error response
+            $response = [
+                'success' => false,
+                'error' => [
+                    'code' => $errorCode,
+                    'message' => $errorMessage,
+                ],
+            ];
+
+            // Add additional error details if available
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                $response['error']['details'] = $e->errors();
+            }
+
+            // Return the JSON error response with CORS headers and an appropriate HTTP status code
+            return response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR)->header('Content-Type', 'application/json');
+        }
     }
 
     /**
@@ -139,33 +171,46 @@ class CountryController extends Controller
     {
         try {
             $data = CountryModel::find($id);
+
             if (!$data) {
                 return response()->json([
                     'messages' => 'Data Not Found'
-                ], Response::HTTP_UNAUTHORIZED);
+                ], Response::HTTP_NOT_FOUND);
             }
 
             // Validate the request
             $request->validate([
                 'name' => 'required',
-                'urlFlag' => 'required',
+                'url_flag' => 'required',
                 'population' => 'required',
                 'area' => 'required',
-                'description' => 'string',
             ]);
 
+            // Check for differences and update only if necessary
+            if ($data->name !== $request->input('name')) {
+                $data->name = $request->input('name');
+            }
 
-            $data->name = $request->input('name');
-            $data->population = $request->input('population');
-            $data->area = $request->input('area');
-            $data->description = $request->input('description');
+            if ($data->population !== $request->input('population')) {
+                $data->population = $request->input('population');
+            }
 
-            if ($data->save()) {
+            if ($data->area !== $request->input('area')) {
+                $data->area = $request->input('area');
+            }
+            
+            // Save only if there are differences
+            if ($data->isDirty() && $data->save()) {
                 return response()->json([
                     'message' => 'Data update successfully',
                     'data' => $data
                 ], Response::HTTP_OK);
             }
+
+            return response()->json([
+                'message' => 'No changes to update',
+                'data' => $data
+            ], Response::HTTP_OK);
         } catch (\Exception $e) {
             // Handle exceptions and return an error response with CORS headers
             $errorMessage = $e->getMessage();
