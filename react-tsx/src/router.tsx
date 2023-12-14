@@ -6,6 +6,7 @@ import NotFound from "./z-global/NotFound";
 
 // Guest Views
 import Home from "./views/guest/Home";
+import Details from "./views/guest/Details";
 
 interface RouteConfig {
   path: string;
@@ -23,7 +24,11 @@ const routerConfig: Record<string, RouteConfig[]> = {
         {
           path: "/",
           element: <Home />,
-        }
+        },
+        {
+          path: "/details/:id",
+          element: <Details />,
+        },
       ],
     },
     {
